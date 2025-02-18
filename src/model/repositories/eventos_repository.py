@@ -1,26 +1,21 @@
 from src.model.configs.connection import DBConnectionHandler
 from src.model.entities.eventos import Eventos
-
 class EventosRepository:
-    def insert(self, event_name: str):
+    def insert(self, event_name: str) -> None:
         with DBConnectionHandler() as db:
             try:
                 new_event = Eventos(nome=event_name)
                 db.session.add(new_event)
                 db.session.commit()
-            except Exception as e:
+            except Exception as exception:
                 db.session.rollback()
-                raise e
-            
+                raise exception
     def select_event(self, event_name: str) -> Eventos:
         with DBConnectionHandler() as db:
-            try:
-                data = (
-                    db.session.query(Eventos)
-                    .filter(Eventos.nome == event_name)
-                    .one_or_none()
-                )
-                return data
-            except sqlalchemy.exc.NoResultFound as e:
-                raise e from None
-    
+            data = (
+                db.session
+                .query(Eventos)
+                .filter(Eventos.nome == event_name)
+                .one_or_none()
+            )
+            return data
